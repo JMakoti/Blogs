@@ -6,7 +6,8 @@ import ImageTool from "@editorjs/image";
 import Checklist from "@editorjs/checklist";
 import EditorjsList from "@editorjs/list";
 import Embed from "@editorjs/embed";
-import { uploadImageToFirebase } from "./firebaseUpload";
+// import { uploadImageToFirebase } from "./firebaseUpload";
+import { uploadToCloudinary } from "./cloudinaryUpload";
 
 const uploadImageByUrl = async (url: string) => {
   try {
@@ -14,7 +15,8 @@ const uploadImageByUrl = async (url: string) => {
     const blob = await response.blob();
     const imageName = url.split("/").pop() || "uploaded-image.jpg";
     const file = new File([blob], imageName, { type: blob.type });
-    const firebaseUrl = await uploadImageToFirebase(file);
+    // const firebaseUrl = await uploadImageToFirebase(file);
+    const firebaseUrl = await uploadToCloudinary(file);
 
     return {
       success: 1,
@@ -57,7 +59,8 @@ export const tools = {
       uploader: {
         uploadByFile: async (file: File) => {
           try {
-            const url = await uploadImageToFirebase(file);
+            // const url = await uploadImageToFirebase(file);
+            const url = await uploadToCloudinary(file);
             return {
               success: 1,
               file: {
