@@ -17,6 +17,7 @@ export async function uploadToCloudinary(file: File){
   );
 
   const data = await response.json();
-  console.log(data);
+  // Log the uploaded secure URL for debugging
+  console.log("Cloudinary upload URL:", data.secure_url);
   return data.secure_url;
 };

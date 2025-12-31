@@ -4,9 +4,21 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link, useLocation } from "react-router";
 import { Separator } from "./ui/separator";
-export default function NavBar() {
-  // Object Destructuring
+import type React from "react";
+
+type NavBarProps = {
+  formRef: React.RefObject<HTMLFormElement | null>; 
+};
+
+const NavBar: React.FC<NavBarProps> = ({ formRef }) => {
+  const handleClick = () => {
+    if (formRef.current) {
+      formRef.current.requestSubmit();
+    }
+  };
+  
   const { pathname } = useLocation();
+
   return (
     <div className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-sm border-b shadow-sm">
       <div className="flex flex-row items-center justify-between mx-auto p-2 max-w-7xl">
@@ -18,14 +30,31 @@ export default function NavBar() {
         <div className="flex flex-row items-center gap-4">
           {!pathname.includes("/write") ? (
             <Link to="/write">
-              <Button className="text-white py-2 px-4">
+              <Button
+                type="button"
+                className="px-4 py-2 bg-black text-white rounded"
+              >
                 <FiEdit /> Write
               </Button>
             </Link>
           ) : (
-              <Button className="text-white py-2 px-4 bg-blue-600 hover:bg-blue-700">
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                className="px-4 py-2 bg-gray-200 rounded"
+                // Optional: You could add a separate function for save draft
+                // onClick={handleSaveDraft}
+              >
+                Save Draft
+              </Button>
+              <Button
+                type="button"
+                onClick={handleClick}
+                className="px-4 py-2 bg-black text-white rounded"
+              >
                 Publish
               </Button>
+            </div>
           )}
 
           <Avatar>
@@ -40,4 +69,6 @@ export default function NavBar() {
       <Separator />
     </div>
   );
-}
+};
+
+export default NavBar;

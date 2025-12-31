@@ -1,12 +1,10 @@
 import Header from "@editorjs/header";
 import Quote from "@editorjs/quote";
 import LinkTool from "@editorjs/link";
-// import SimpleImage from "@editorjs/simple-image";
 import ImageTool from "@editorjs/image";
 import Checklist from "@editorjs/checklist";
 import EditorjsList from "@editorjs/list";
 import Embed from "@editorjs/embed";
-// import { uploadImageToFirebase } from "./firebaseUpload";
 import { uploadToCloudinary } from "./cloudinaryUpload";
 
 const uploadImageByUrl = async (url: string) => {
@@ -15,7 +13,6 @@ const uploadImageByUrl = async (url: string) => {
     const blob = await response.blob();
     const imageName = url.split("/").pop() || "uploaded-image.jpg";
     const file = new File([blob], imageName, { type: blob.type });
-    // const firebaseUrl = await uploadImageToFirebase(file);
     const firebaseUrl = await uploadToCloudinary(file);
 
     return {
@@ -35,19 +32,20 @@ const uploadImageByUrl = async (url: string) => {
 export const tools = {
   header: {
     class: Header,
-    // inlineToolbar: true,
+    inlineToolbar: true,
     config: {
       placeholder: "Type Heading.....",
       levels: [1, 2, 3, 4, 5, 6],
       defaultLevel: 2,
     },
   },
-  linkTool: {
-    class: LinkTool,
-    config: {
-      endpoint: "http://localhost:8008/fetchUrl", // Your backend endpoint for url data fetching,
-    },
-  },
+  LinkTool: LinkTool,
+  // linkTool: {
+  //   class: LinkTool,
+  //   config: {
+  //     endpoint: "http://localhost:8008/fetchUrl", // Your backend endpoint for url data fetching,
+  //   },
+  // },
   checklist: {
     class: Checklist,
     inlineToolbar: true,
@@ -66,7 +64,9 @@ export const tools = {
               file: {
                 url: url,
               },
+              
             };
+            
           } catch (error) {
             console.error("Firebase Upload Error:", error);
             return {
