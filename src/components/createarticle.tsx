@@ -86,7 +86,7 @@ export default function CreateArticle() {
   return (
     <div>
       <div
-        className="bg-contain bg-center h-screen bg-no-repeat"
+        className="bg-fixed md:bg-contain bg-cover bg-contain bg-center h-screen bg-no-repeat"
         style={{ backgroundImage: `url(${bgCover})` }}
       >
         <div className="max-w-4xl mx-auto pt-20 bg-white/80 p-3 rounded">
