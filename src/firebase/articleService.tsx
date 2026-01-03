@@ -1,35 +1,43 @@
-// import { db } from './firebase'; 
-// import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
+import { db } from "./firebase";
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  Timestamp,
+} from "firebase/firestore";
 
-// export const getArticles = async () => {
-//   try {
-//     const querySnapshot = await getDocs(collection(db, 'articles'));
-//     const articles = querySnapshot.docs.map(doc => ({
-//       id: doc.id,
-//       ...doc.data()
-//     }));
-//     return articles;
-//   } catch (error) {
-//     console.error("Error getting articles:", error);
-//     throw error;
-//   }
-// };
+export type Article = {
+  id: string;
+  title: string;
+  author: string;
+  authorBio: string;
+  excerpt: string;
+  imageUrl: string;
+  createdAt: Timestamp;
+  readTime: string;
+  content: any;
+};
 
-// export const getArticleById = async (articleId) => {
-//   try {
-//     const docRef = doc(db, 'articles', articleId);
-//     const docSnap = await getDoc(docRef);
-    
-//     if (docSnap.exists()) {
-//       return {
-//         id: docSnap.id,
-//         ...docSnap.data()
-//       };
-//     } else {
-//       throw new Error("Article not found");
-//     }
-//   } catch (error) {
-//     console.error("Error getting article:", error);
-//     throw error;
-//   }
-// };
+export const getArticles = async (): Promise<Article[]> => {
+  const snapshot = await getDocs(collection(db, "articles"));
+
+  return snapshot.docs.map((d) => ({
+    id: d.id,
+    ...(d.data() as Omit<Article, "id">),
+  }));
+};
+
+export const getArticleById = async (id: string) => {
+  const ref = doc(db, "articles", id);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    throw new Error("Article not found");
+  }
+
+  return {
+    id: snap.id,
+    ...(snap.data() as any),
+  };
+};

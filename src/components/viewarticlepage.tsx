@@ -1,93 +1,12 @@
 import imgFrame from "@/assets/img/img-frame.png";
 import { Bookmark, MoreHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { motion } from "framer-motion";
 import { Link } from "react-router";
-
-const articles = [
-  {
-    id: 1,
-    title: "The Art of Mindful Living: A Journey to Inner Peace",
-    excerpt:
-      "Discover the transformative power of being present in every moment of your daily life. Learn practical techniques for cultivating awareness and finding calm in chaos.",
-    author: "Elena Martinez",
-    img: "https://images.pexels.com/photos/3576284/pexels-photo-3576284.jpeg",
-    category: "Lifestyle",
-    date: "Dec 28",
-  },
-  {
-    id: 2,
-    title: "Sustainable Architecture: Building Tomorrow's Cities Today",
-    excerpt:
-      "How modern architects are reimagining buildings with environmental consciousness and creating spaces that breathe with nature. The future of urban development.",
-    author: "James Chen",
-
-    img: "https://images.pexels.com/photos/3320529/pexels-photo-3320529.jpeg",
-    category: "Design",
-    date: "Dec 25",
-  },
-  {
-    id: 3,
-    title: "The Future of Digital Art: Where Technology Meets Creativity",
-    excerpt:
-      "Exploring the intersection of technology and creativity in the modern art world. From NFTs to immersive installations, discover what's next.",
-    author: "Sofia Laurent",
-    category: "Art",
-    img: "https://images.pexels.com/photos/7650786/pexels-photo-7650786.jpeg",
-    date: "Dec 22",
-  },
-  {
-    id: 4,
-    title: "AI in Everyday Life: Smarter Living Through Technology",
-    excerpt:
-      "A deep dive into how artificial intelligence is reshaping daily routines, from smart homes to personalized digital assistants.",
-    author: "Daniel Kim",
-    category: "Technology",
-    img: "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg",
-    date: "Jan 05",
-  },
-  {
-    id: 5,
-    title: "Sustainable Fashion: Redefining Style with Purpose",
-    excerpt:
-      "How eco-friendly materials and ethical production are transforming the global fashion industry for the better.",
-    author: "Amara Njeri",
-    category: "Fashion",
-    img: "https://images.pexels.com/photos/5709656/pexels-photo-5709656.jpeg",
-    date: "Jan 10",
-  },
-  {
-    id: 6,
-    title: "The Rise of Remote Work: Opportunities and Challenges",
-    excerpt:
-      "Examining how remote work is changing company culture, productivity, and work-life balance worldwide.",
-    author: "Michael Torres",
-    category: "Business",
-    img: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg",
-    date: "Jan 14",
-  },
-  {
-    id: 7,
-    title: "Healthy Minds: The Importance of Mental Wellness Today",
-    excerpt:
-      "Understanding mental health awareness, modern coping strategies, and why open conversations matter more than ever.",
-    author: "Grace Mwangi",
-    category: "Health",
-    img: "https://images.pexels.com/photos/4101143/pexels-photo-4101143.jpeg",
-    date: "Jan 18",
-  },
-  {
-    id: 8,
-    title: "Exploring the World: Travel Trends Shaping 2025",
-    excerpt:
-      "From eco-tourism to digital nomad destinations, discover the travel trends redefining global exploration.",
-    author: "Lucas Bennett",
-    category: "Travel",
-    img: "https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg",
-    date: "Jan 22",
-  },
-];
+import { getArticles } from "@/firebase/articleService";
+import type { Article } from "@/firebase/articleService";
+import moment from "moment";
 
 const topics = [
   "Programming",
@@ -110,9 +29,44 @@ const getInitials = (author: string) => {
 };
 
 export default function ViewArticlePage() {
-  const [savedArticles, setSavedArticles] = useState<number[]>([]);
+  const [savedArticles, setSavedArticles] = useState<String[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const toggleSave = (id: number) => {
+  useEffect(() => {
+    getArticles()
+      .then(setArticles)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading)
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-muted-foreground">
+        <svg
+          className="animate-spin h-8 w-8 text-foreground mb-4"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v8H4z"
+          />
+        </svg>
+        <span className="text-lg font-medium">Loading article…</span>
+      </div>
+    );
+
+  const toggleSave = (id: String) => {
     setSavedArticles((prev) =>
       prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
     );
@@ -185,7 +139,14 @@ export default function ViewArticlePage() {
                     {/* Meta */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{article.date}</span>
+                        <span>
+                          {article.createdAt
+                            ? moment(
+                                article.createdAt.toDate?.() ??
+                                  article.createdAt
+                              ).format("MMM Do YY")
+                            : "Unknown date"}
+                        </span>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -225,7 +186,7 @@ export default function ViewArticlePage() {
                   >
                     <img
                       loading="lazy"
-                      src={article.img}
+                      src={article.imageUrl}
                       alt={article.title}
                       className="w-25 ml-4 h-26 pt-3 md:w-36 md:h-38 object-cover md:pt-5 md:ml-5"
                     />
