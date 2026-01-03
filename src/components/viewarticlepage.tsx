@@ -3,6 +3,7 @@ import { Bookmark, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { motion } from "framer-motion";
+import { Link } from "react-router";
 
 const articles = [
   {
@@ -170,9 +171,11 @@ export default function ViewArticlePage() {
                     </div>
 
                     {/* Title */}
-                    <h2 className="text-xl font-bold text-foreground leading-tight mb-1 group-hover:underline decoration-1 underline-offset-2 font-serif">
-                      {article.title}
-                    </h2>
+                    <Link to={`/${article.id}`}>
+                      <h2 className="text-xl font-bold text-foreground leading-tight mb-1 group-hover:underline decoration-1 underline-offset-2 font-serif cursor-pointer">
+                        {article.title}
+                      </h2>
+                    </Link>
 
                     {/* Excerpt - hidden on mobile */}
                     <p className="hidden md:block text-base text-muted-foreground leading-relaxed mb-3 line-clamp-2">

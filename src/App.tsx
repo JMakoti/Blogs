@@ -3,7 +3,7 @@ import { ToastContainer } from "react-toastify";
 import Layout from "./components/layout";
 import ViewArticle from "./components/viewarticle";
 import CreateArticle from "./components/createarticle";
-import ArticleInfo from "./components/articleinfo";
+import ArticleDetail from "./components/articleinfo";
 
 function App() {
   return (
@@ -13,8 +13,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<ViewArticle />} />
-          <Route path="/write" element={<CreateArticle />} />
-          <Route path="/:id" element={<ArticleInfo />} />
+          <Route path="/write" element={<CreateArticle  />} />
+          <Route path="/:articleId" element={<ArticleDetail  />} />
         </Route>
       </Routes>
     </>
