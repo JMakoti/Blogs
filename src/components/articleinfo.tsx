@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router";
 import bgCover from "../assets/img/bg-cover.png";
 import { Clock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import EditorJsRenderer from "@/components/EditorJsrenderer";
+import EditorJsRenderer from "@/components/editorJsrenderer";
 import { useEffect, useState } from "react";
 import { getArticleById, type Article } from "@/firebase/articleService";
 import moment from "moment";

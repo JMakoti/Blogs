@@ -7,7 +7,7 @@ import { Separator } from "./ui/separator";
 import type React from "react";
 
 type NavBarProps = {
-  formRef: React.RefObject<HTMLFormElement | null>; 
+  formRef: React.RefObject<HTMLFormElement | null>;
 };
 
 const NavBar: React.FC<NavBarProps> = ({ formRef }) => {
@@ -16,7 +16,13 @@ const NavBar: React.FC<NavBarProps> = ({ formRef }) => {
       formRef.current.requestSubmit();
     }
   };
-  
+
+  const handleUpdate = () => {
+    if (formRef.current) {
+      formRef.current.requestSubmit();
+    }
+  };
+
   const { pathname } = useLocation();
 
   return (
@@ -28,7 +34,7 @@ const NavBar: React.FC<NavBarProps> = ({ formRef }) => {
           </Link>
         </div>
         <div className="flex flex-row items-center gap-4">
-          {!pathname.includes("/write") ? (
+          {!pathname.includes("/write") && !pathname.includes("/edit") ? (
             <Link to="/write">
               <Button
                 type="button"
@@ -37,7 +43,7 @@ const NavBar: React.FC<NavBarProps> = ({ formRef }) => {
                 <FiEdit /> Write
               </Button>
             </Link>
-          ) : (
+          ) : pathname.includes("/write") ? (
             <div className="flex gap-3">
               <Button
                 type="button"
@@ -55,7 +61,15 @@ const NavBar: React.FC<NavBarProps> = ({ formRef }) => {
                 Publish
               </Button>
             </div>
-          )}
+          ) : pathname.includes("/edit") ? (
+            <Button
+              type="button"
+              onClick={handleUpdate}
+              className="px-4 py-2 bg-black text-white rounded"
+            >
+              Update
+            </Button>
+          ) : null}
 
           <Avatar>
             <AvatarImage

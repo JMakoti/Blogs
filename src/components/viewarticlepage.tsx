@@ -3,11 +3,18 @@ import { Bookmark, MoreHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { motion } from "framer-motion";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { getArticles } from "@/firebase/articleService";
 import type { Article } from "@/firebase/articleService";
 import moment from "moment";
 import noImage from "@/assets/img/placeholder.png";
+import { Pencil, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 const topics = [
   "Programming",
@@ -33,6 +40,8 @@ export default function ViewArticlePage() {
   const [savedArticles, setSavedArticles] = useState<String[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getArticles()
@@ -73,6 +82,9 @@ export default function ViewArticlePage() {
     );
   };
 
+  const handleDelete = (id: String) => {
+    if (!confirm(`Are you sure you want to delete this article ${id}?`)) return;
+  };
   return (
     <div>
       {/* Topics Bar */}
@@ -176,9 +188,35 @@ export default function ViewArticlePage() {
                               />
                             </motion.div>
                           </button>
-                          <button className="p-2 hover:bg-surface-hover rounded-full transition-colors">
-                            <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
-                          </button>
+                          <div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button className="p-2 hover:bg-surface-hover rounded-full rounded-full">
+                                  <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
+                                </button>
+                              </DropdownMenuTrigger>
+
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    navigate(`/edit/${article.id}`)
+                                  }
+                                >
+                                  <Pencil className="mr-2 h-4 w-4" />
+                                  Update
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                  className="text-red-600"
+                                  onClick={() => handleDelete(article.id)}
+                                  disabled={true}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
                       </div>
                     </div>

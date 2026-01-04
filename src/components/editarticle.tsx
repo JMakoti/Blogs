@@ -3,16 +3,19 @@ import bgCover from "@/assets/img/bg-cover.png";
 import EditorJS from "@editorjs/editorjs";
 import { tools } from "./editorTools";
 import { db } from "@/firebase/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { useNavigate, useOutletContext } from "react-router";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { useNavigate, useOutletContext, useParams } from "react-router";
 import { toast } from "react-toastify";
 import { uploadToCloudinary } from "./cloudinaryUpload";
+import { getArticleById, type Article } from "@/firebase/articleService";
 
 type EditorActions = {
   formRef: React.RefObject<HTMLFormElement>;
 };
 
-export default function CreateArticle() {
+export default function EditArticle() {
+  const { articleId } = useParams<{ articleId: string }>();
+  const [article, setArticle] = useState<Article | null>(null);
   const { formRef } = useOutletContext<EditorActions>();
 
   const editorRef = useRef<EditorJS | null>(null);
@@ -23,21 +26,47 @@ export default function CreateArticle() {
   const [readTime, setReadTime] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imagePublicId, setImagePublicId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [actionType] = useState<"draft" | "published">("published");
 
   const navigate = useNavigate();
 
-  // Initialize EditorJS
+  // Fetch article
   useEffect(() => {
-    if (editorRef.current) return;
+    if (!articleId) return;
+    setLoading(true);
+
+    getArticleById(articleId)
+      .then((data) => {
+        if (!data) {
+          toast.error("Article not found");
+          return;
+        }
+        setArticle(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to load article");
+      })
+      .finally(() => setLoading(false));
+  }, [articleId]);
+
+  // Initialize editor when article is ready
+  useEffect(() => {
+    if (!article || editorRef.current) return;
+
+    setTitle(article.title || "");
+    setExcerpt(article.excerpt || "");
+    setAuthor(article.author || "");
+    setAuthorBio(article.authorBio || "");
+    setReadTime(article.readTime || "");
+    setImagePreview(article.imageUrl || null);
 
     const editor = new EditorJS({
       holder: "editorjs",
+      data: article.content,
       autofocus: true,
       tools: tools,
-      placeholder: "Start writing your article...",
       onReady: () => {
         editorRef.current = editor;
       },
@@ -49,9 +78,9 @@ export default function CreateArticle() {
         editorRef.current = null;
       }
     };
-  }, []);
+  }, [article]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!editorRef.current || !title.trim()) {
@@ -59,23 +88,19 @@ export default function CreateArticle() {
       return;
     }
 
-    if (!excerpt.trim()) {
-      toast.error("Please add an excerpt");
-      return;
-    }
-
     try {
       setLoading(true);
-      let imageUrl = "";
+      let imageUrl = article!.imageUrl || "";
+      let imagePublicId = article?.imagePublicId || "";
 
       // Upload image to Cloudinary if exists
       if (image) {
         try {
           toast.info("Uploading image...");
-          const { url, publicId } = await uploadToCloudinary(image);
+          const result = await uploadToCloudinary(image, imagePublicId);
 
-          imageUrl = url;
-          setImagePublicId(publicId);
+          imageUrl = result.url;
+          imagePublicId = result.publicId;
 
           toast.success("Image uploaded successfully!");
         } catch (error) {
@@ -100,22 +125,15 @@ export default function CreateArticle() {
         status: actionType,
         imageUrl,
         imagePublicId,
-        createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
 
       // Save to Firebase
-      await addDoc(collection(db, "articles"), articleData);
+      const articleRef = doc(db, "articles", article!.id);
+      await updateDoc(articleRef, articleData);
 
-      toast.success(
-        `Article ${
-          actionType === "published" ? "published" : "saved as draft"
-        } successfully!`
-      );
-
-      // Reset form
-      resetForm();
-      navigate("/");
+      toast.success("Article updated successfully!");
+      navigate(`/${article!.id}`);
     } catch (error) {
       console.error("Error saving article:", error);
       toast.error("Failed to save article");
@@ -156,53 +174,6 @@ export default function CreateArticle() {
     }
   };
 
-  const resetForm = () => {
-    setTitle("");
-    setExcerpt("");
-    setAuthor("");
-    setAuthorBio("");
-    setReadTime("");
-    setImage(null);
-    setImagePreview(null);
-
-    // Clean up image preview URL
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-
-    // Clear editor
-    if (editorRef.current) {
-      editorRef.current.clear();
-    }
-  };
-
-  // Separate handlers for save draft and publish
-  //   const handleSaveDraft = (e: React.MouseEvent) => {
-  //     e.preventDefault();
-  //     setActionType("draft");
-
-  //     // Use setTimeout to ensure state updates before form submission
-  //     setTimeout(() => {
-  //       if (formRef.current) {
-  //         const formEvent = new Event('submit', { bubbles: true, cancelable: true });
-  //         formRef.current.dispatchEvent(formEvent);
-  //       }
-  //     }, 0);
-  //   };
-
-  //   const handlePublish = (e: React.MouseEvent) => {
-  //     e.preventDefault();
-  //     setActionType("published");
-
-  //     // Use setTimeout to ensure state updates before form submission
-  //     setTimeout(() => {
-  //       if (formRef.current) {
-  //         const formEvent = new Event('submit', { bubbles: true, cancelable: true });
-  //         formRef.current.dispatchEvent(formEvent);
-  //       }
-  //     }, 0);
-  //   };
-
   // Remove image
   const removeImage = () => {
     setImage(null);
@@ -219,7 +190,7 @@ export default function CreateArticle() {
         style={{ backgroundImage: `url(${bgCover})` }}
       >
         <div className="max-w-4xl mx-auto pt-20 bg-white/80 p-6 rounded-lg">
-          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+          <form ref={formRef} onSubmit={handleUpdate} className="space-y-6">
             {/* Title Input */}
             <div>
               <label

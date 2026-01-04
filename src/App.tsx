@@ -4,6 +4,7 @@ import Layout from "./components/layout";
 import ViewArticle from "./components/viewarticle";
 import CreateArticle from "./components/createarticle";
 import ArticleDetail from "./components/articleinfo";
+import EditArticle from "./components/editarticle";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route index element={<ViewArticle />} />
           <Route path="/write" element={<CreateArticle  />} />
           <Route path="/:articleId" element={<ArticleDetail  />} />
+          <Route path="/edit/:articleId" element={<EditArticle  />} />
         </Route>
       </Routes>
     </>

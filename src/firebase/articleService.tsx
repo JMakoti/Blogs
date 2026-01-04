@@ -13,10 +13,11 @@ export type Article = {
   author: string;
   authorBio: string;
   excerpt: string;
-  imageUrl: string;
+  imageUrl?: string;
   createdAt: Timestamp;
   readTime: string;
   content: any;
+  imagePublicId?: string;
 };
 
 export const getArticles = async (): Promise<Article[]> => {
@@ -41,3 +42,19 @@ export const getArticleById = async (id: string) => {
     ...(snap.data() as any),
   };
 };
+
+// export const updateArticleById = async (id: string, data: Partial<Article>) => {
+//   const ref = doc(db, "articles", id);
+//   await ref.update(data);
+// };
+
+// export const createArticle = async (data: Omit<Article, "id">) => {
+//   const ref = collection(db, "articles");
+//   const docRef = await ref.add(data);
+//   return docRef.id;
+// };
+
+// export const deleteArticleById = async (id: string) => {
+//   const ref = doc(db, "articles", id);
+//   await ref.delete();
+// };
