@@ -7,6 +7,7 @@ import { Link } from "react-router";
 import { getArticles } from "@/firebase/articleService";
 import type { Article } from "@/firebase/articleService";
 import moment from "moment";
+import noImage from "@/assets/img/placeholder.png";
 
 const topics = [
   "Programming",
@@ -92,7 +93,7 @@ export default function ViewArticlePage() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-[1336px] mx-auto px-6 py-10">
+      <main className="max-w-[1336px] mx-auto px-6 py-10 bg-white/90">
         <div className="grid lg:grid-cols-[1fr_340px] gap-16">
           {/* Articles Feed */}
           <div className="space-y-10">
@@ -186,7 +187,7 @@ export default function ViewArticlePage() {
                   >
                     <img
                       loading="lazy"
-                      src={article.imageUrl}
+                      src={article.imageUrl || noImage}
                       alt={article.title}
                       className="w-25 ml-4 h-26 pt-3 md:w-36 md:h-38 object-cover md:pt-5 md:ml-5"
                     />
