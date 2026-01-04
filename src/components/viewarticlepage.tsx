@@ -97,116 +97,125 @@ export default function ViewArticlePage() {
         <div className="grid lg:grid-cols-[1fr_340px] gap-16">
           {/* Articles Feed */}
           <div className="space-y-10">
-            {articles.map((article, index) => (
-              <motion.article
-                key={article.id}
-                className="group cursor-pointer"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.5,
-                  ease: "easeOut",
-                  delay: index * 0.05,
-                }}
-              >
-                <div className="flex gap-6">
-                  {/* Content */}
-                  <div className="flex-1 min-w-0 text-start">
-                    {/* Author Info */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <Avatar className="w-6 h-6 sm:w-8 sm:h-8">
-                        <AvatarFallback className="text-xs sm:text-sm">
-                          {getInitials(article.author)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium text-foreground">
-                        {article.author}
-                      </span>
-                    </div>
-
-                    {/* Title */}
-                    <Link to={`/${article.id}`}>
-                      <h2 className="text-xl font-bold text-foreground leading-tight mb-1 group-hover:underline decoration-1 underline-offset-2 font-serif cursor-pointer">
-                        {article.title}
-                      </h2>
-                    </Link>
-
-                    {/* Excerpt - hidden on mobile */}
-                    <p className="hidden md:block text-base text-muted-foreground leading-relaxed mb-3 line-clamp-2">
-                      {article.excerpt}
-                    </p>
-
-                    {/* Meta */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>
-                          {article.createdAt
-                            ? moment(
-                                article.createdAt.toDate?.() ??
-                                  article.createdAt
-                              ).format("MMM Do YY")
-                            : "Unknown date"}
+            {[...articles]
+              .sort(
+                (a: Article, b: Article) =>
+                  b.createdAt.toMillis() - a.createdAt.toMillis()
+              )
+              .map((article, index) => (
+                <motion.article
+                  key={article.id}
+                  className="group cursor-pointer"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.5,
+                    ease: "easeOut",
+                    delay: index * 0.05,
+                  }}
+                >
+                  <div className="flex gap-6">
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 text-start">
+                      {/* Author Info */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <Avatar className="w-6 h-6 sm:w-8 sm:h-8">
+                          <AvatarFallback className="text-xs sm:text-sm">
+                            {getInitials(article.author)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-foreground">
+                          {article.author}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleSave(article.id);
-                          }}
-                          className="p-2 hover:bg-surface-hover rounded-full transition-colors"
-                        >
-                          <motion.div
-                            whileTap={{ scale: 0.85 }}
-                            whileHover={{ scale: 1.1 }}
+                      {/* Title */}
+                      <Link to={`/${article.id}`}>
+                        <h2 className="text-xl font-bold text-foreground leading-tight mb-1 group-hover:underline decoration-1 underline-offset-2 font-serif cursor-pointer">
+                          {article.title}
+                        </h2>
+                      </Link>
+
+                      {/* Excerpt - hidden on mobile */}
+                      <p className="hidden md:block text-base text-muted-foreground leading-relaxed mb-3 line-clamp-2">
+                        {article.excerpt}
+                      </p>
+
+                      {/* Meta */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span>
+                            {article.createdAt
+                              ? moment(
+                                  article.createdAt.toDate?.() ??
+                                    article.createdAt
+                                ).format("MMM Do YY")
+                              : "Unknown date"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSave(article.id);
+                            }}
+                            className="p-2 hover:bg-surface-hover rounded-full transition-colors"
                           >
-                            <Bookmark
-                              className={`w-5 h-5 ${
-                                savedArticles.includes(article.id)
-                                  ? "fill-foreground text-foreground"
-                                  : "text-muted-foreground"
-                              }`}
-                            />
-                          </motion.div>
-                        </button>
-                        <button className="p-2 hover:bg-surface-hover rounded-full transition-colors">
-                          <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
-                        </button>
+                            <motion.div
+                              whileTap={{ scale: 0.85 }}
+                              whileHover={{ scale: 1.1 }}
+                            >
+                              <Bookmark
+                                className={`w-5 h-5 ${
+                                  savedArticles.includes(article.id)
+                                    ? "fill-foreground text-foreground"
+                                    : "text-muted-foreground"
+                                }`}
+                              />
+                            </motion.div>
+                          </button>
+                          <button className="p-2 hover:bg-surface-hover rounded-full transition-colors">
+                            <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
+                          </button>
+                        </div>
                       </div>
                     </div>
+
+                    {/* Image */}
+                    <motion.div
+                      className="w-35 h-35 md:w-50 md:h-50 flex-shrink-0 bg-cover bg-center bg-no-repeat"
+                      style={{ backgroundImage: `url(${imgFrame})` }}
+                      whileHover={{ scale: 1.03 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 15,
+                      }}
+                    >
+                      <img
+                        loading="lazy"
+                        src={article.imageUrl || noImage}
+                        alt={article.title}
+                        className="w-25 ml-4 h-26 pt-3 md:w-36 md:h-38 object-cover md:pt-5 md:ml-5"
+                      />
+                    </motion.div>
                   </div>
 
-                  {/* Image */}
-                  <motion.div
-                    className="w-35 h-35 md:w-50 md:h-50 flex-shrink-0 bg-cover bg-center bg-no-repeat"
-                    style={{ backgroundImage: `url(${imgFrame})` }}
-                    whileHover={{ scale: 1.03 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                  >
-                    <img
-                      loading="lazy"
-                      src={article.imageUrl || noImage}
-                      alt={article.title}
-                      className="w-25 ml-4 h-26 pt-3 md:w-36 md:h-38 object-cover md:pt-5 md:ml-5"
-                    />
-                  </motion.div>
-                </div>
-
-                {/* Divider */}
-                {/* <div className="mt-10 border-b border-border" /> */}
-                <div className="mt-10 w-full">
-                  <motion.svg
-                    viewBox="0 0 1200 30"
-                    className="w-full h-6"
-                    preserveAspectRatio="none"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                  >
-                    <motion.path
-                      d="M0 15 
+                  {/* Divider */}
+                  {/* <div className="mt-10 border-b border-border" /> */}
+                  <div className="mt-10 w-full">
+                    <motion.svg
+                      viewBox="0 0 1200 30"
+                      className="w-full h-6"
+                      preserveAspectRatio="none"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                    >
+                      <motion.path
+                        d="M0 15 
          Q 50 0 100 15 
          T 200 15 
          T 300 15 
@@ -219,18 +228,18 @@ export default function ViewArticlePage() {
          T 1000 15 
          T 1100 15 
          T 1200 15"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="text-border"
-                      initial={{ pathLength: 0 }}
-                      whileInView={{ pathLength: 1 }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
-                    />
-                  </motion.svg>
-                </div>
-              </motion.article>
-            ))}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="text-border"
+                        initial={{ pathLength: 0 }}
+                        whileInView={{ pathLength: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                      />
+                    </motion.svg>
+                  </div>
+                </motion.article>
+              ))}
           </div>
 
           {/* Sidebar */}
