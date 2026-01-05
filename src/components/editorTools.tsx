@@ -2,7 +2,6 @@ import Header from "@editorjs/header";
 import Quote from "@editorjs/quote";
 import LinkTool from "@editorjs/link";
 import ImageTool from "@editorjs/image";
-import Checklist from "@editorjs/checklist";
 import EditorjsList from "@editorjs/list";
 import Embed from "@editorjs/embed";
 import { uploadToCloudinary } from "./cloudinaryUpload";
