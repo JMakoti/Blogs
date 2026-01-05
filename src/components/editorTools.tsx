@@ -46,10 +46,10 @@ export const tools = {
   //     endpoint: "http://localhost:8008/fetchUrl", // Your backend endpoint for url data fetching,
   //   },
   // },
-  checklist: {
-    class: Checklist,
-    inlineToolbar: true,
-  },
+  // checklist: {
+  //   class: Checklist,
+  //   inlineToolbar: true,
+  // },
   image: {
     class: ImageTool,
     config: {
@@ -95,9 +95,9 @@ export const tools = {
   list: {
     class: EditorjsList,
     inlineToolbar: true,
-    config: {
-      defaultStyle: "unordered",
-    },
+    // config: {
+    //   defaultStyle: "unordered",
+    // },
   },
   embed: {
     class: Embed,
