@@ -14,16 +14,18 @@ export async function uploadToCloudinary(file: File, publicId?: string) {
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${
       import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
-    }/auto/upload`,
+    }/image/upload`,
     {
       method: "POST",
       body: formData,
     }
   );
 
+  if (!response.ok) {
+    throw new Error("Cloudinary upload failed");
+  }
+
   const data = await response.json();
-  // Log the uploaded secure URL for debugging
-  console.log("Cloudinary upload URL:", data.secure_url);
   return {
     url: data.secure_url,
     publicId: data.public_id,

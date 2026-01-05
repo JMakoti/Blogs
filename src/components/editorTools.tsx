@@ -13,12 +13,12 @@ const uploadImageByUrl = async (url: string) => {
     const blob = await response.blob();
     const imageName = url.split("/").pop() || "uploaded-image.jpg";
     const file = new File([blob], imageName, { type: blob.type });
-    const firebaseUrl = await uploadToCloudinary(file);
-
+    const { url: firebaseUrl, publicId } = await uploadToCloudinary(file);
     return {
       success: 1,
       file: {
         url: firebaseUrl,
+        publicId: publicId,
       },
     };
   } catch (error) {
@@ -39,7 +39,7 @@ export const tools = {
       defaultLevel: 2,
     },
   },
-  LinkTool: LinkTool,
+  linkTool: LinkTool,
   // linkTool: {
   //   class: LinkTool,
   //   config: {
@@ -50,7 +50,6 @@ export const tools = {
     class: Checklist,
     inlineToolbar: true,
   },
-  // image: SimpleImage,
   image: {
     class: ImageTool,
     config: {
@@ -58,15 +57,14 @@ export const tools = {
         uploadByFile: async (file: File) => {
           try {
             // const url = await uploadImageToFirebase(file);
-            const url = await uploadToCloudinary(file);
+            const { url, publicId } = await uploadToCloudinary(file);
             return {
               success: 1,
               file: {
                 url: url,
+                publicId: publicId,
               },
-              
             };
-            
           } catch (error) {
             console.error("Firebase Upload Error:", error);
             return {
@@ -94,12 +92,15 @@ export const tools = {
       captionPlaceholder: "Quote's author",
     },
   },
-  List: {
+  list: {
     class: EditorjsList,
     inlineToolbar: true,
     config: {
       defaultStyle: "unordered",
     },
   },
-  embed: Embed,
+  embed: {
+    class: Embed,
+    inlineToolbar: false,
+  },
 };

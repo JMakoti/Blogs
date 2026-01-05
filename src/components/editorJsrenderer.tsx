@@ -83,16 +83,51 @@ export default function EditorJsRenderer({ data }: EditorJsRendererProps) {
             );
           }
 
-          case "list":
+          case "list": {
+            const ListTag = block.data.style === "ordered" ? "ol" : "ul";
+
             return (
-              <ul key={block.id ?? index} className={classNames.list.container}>
-                {block.data.items.map((item: string, i: number) => (
-                  <li
-                    key={i}
-                    className={classNames.list.listItem}
-                    dangerouslySetInnerHTML={{ __html: item }}
-                  />
-                ))}
+              <ListTag
+                key={block.id ?? index}
+                className={classNames.list.container}
+              >
+                {block.data.items.map((item: any, i: number) => {
+                  // Editor.js list items may be strings or objects depending on the version/plugin.
+                  const content =
+                    typeof item === "string"
+                      ? item
+                      : item?.content ?? item?.text ?? "";
+
+                  return (
+                    <li
+                      key={i}
+                      className={classNames.list.listItem}
+                      dangerouslySetInnerHTML={{ __html: content }}
+                    />
+                  );
+                })}
+              </ListTag>
+            );
+          }
+
+          case "checklist":
+            return (
+              <ul key={block.id ?? index} className="my-6 space-y-2">
+                {block.data.items.map((item: any, i: number) => {
+                  // Checklist items may come as objects { text, checked } or as strings.
+                  const text = typeof item === "string" ? item : item?.text ?? item?.content ?? "";
+                  const checked = typeof item === "object" ? !!item.checked : false;
+
+                  return (
+                    <li key={i} className="flex items-center gap-2">
+                      <input type="checkbox" checked={checked} readOnly />
+                      <span
+                        dangerouslySetInnerHTML={{ __html: text }}
+                        className={checked ? "line-through text-muted-foreground" : ""}
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             );
 

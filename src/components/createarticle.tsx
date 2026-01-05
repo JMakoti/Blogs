@@ -107,6 +107,9 @@ export default function CreateArticle() {
       // Save to Firebase
       await addDoc(collection(db, "articles"), articleData);
 
+      console.log("Article saved:", articleData);
+      console.log("Article content:", content);
+
       toast.success(
         `Article ${
           actionType === "published" ? "published" : "saved as draft"
